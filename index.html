@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Resume</title>
+
+<!--
+  ============================================================
+  HOW THIS WORKS
+  ------------------------------------------------------------
+  - Your CONTENT lives in resume-data.js  (edit that file)
+  - Your DESIGN lives in the <style> block below (edit colors,
+    fonts, spacing here, in the ":root" section first)
+  - To export a PDF: open this file in a browser, click the
+    "Download PDF" button (top right) or press Ctrl/Cmd + P
+    and choose "Save as PDF".
+  ============================================================
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  /* ============================================================
+     DESIGN TOKENS — change these to restyle the whole resume
+     ============================================================ */
+  :root{
+    /* Colors */
+    --color-bg:        #FAF8F3;   /* page background (ivory) */
+    --color-surface:   #FFFFFF;   /* card background */
+    --color-ink:       #20242C;   /* main text */
+    --color-muted:     #6B7280;   /* secondary text */
+    --color-navy:      #1B2A45;   /* headings / name */
+    --color-accent:    #9C7A36;   /* gold-bronze accent (rules, dates) */
+    --color-line:      #E4E0D8;   /* hairline dividers */
+
+    /* Typography */
+    --font-display: "Source Serif 4", Georgia, serif;
+    --font-body:    "IBM Plex Sans", "Segoe UI", Arial, sans-serif;
+    --font-mono:    "IBM Plex Mono", "SF Mono", monospace;
+
+    /* Layout */
+    --page-width:   850px;
+    --page-padding: 56px;
+    --section-gap:  28px;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html, body{
+    margin: 0;
+    padding: 0;
+    background: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ============================================================
+     PAGE / CARD
+     ============================================================ */
+  .page{
+    max-width: var(--page-width);
+    margin: 40px auto;
+    background: var(--color-surface);
+    padding: var(--page-padding);
+    box-shadow: 0 1px 3px rgba(20,20,20,0.06), 0 12px 40px rgba(20,20,20,0.05);
+  }
+
+  /* ============================================================
+     TOOLBAR (hidden when printing)
+     ============================================================ */
+  .toolbar{
+    max-width: var(--page-width);
+    margin: 24px auto 0;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 var(--page-padding);
+  }
+  .toolbar button{
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--color-navy);
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    padding: 10px 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color .15s ease, color .15s ease;
+  }
+  .toolbar button:hover{
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  /* ============================================================
+     HEADER
+     ============================================================ */
+  .header{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-bottom: 2px solid var(--color-navy);
+    padding-bottom: 18px;
+    margin-bottom: var(--section-gap);
+  }
+  .header h1{
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 34px;
+    letter-spacing: 0.01em;
+    color: var(--color-navy);
+    margin: 0;
+  }
+  .contact-list{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--color-muted);
+    justify-content: flex-end;
+    text-align: right;
+  }
+  .contact-list a{
+    color: var(--color-muted);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+  }
+  .contact-list a:hover{
+    color: var(--color-accent);
+    border-bottom-color: var(--color-accent);
+  }
+
+  /* ============================================================
+     SECTION HEADERS  — "ledger" style label + rule
+     ============================================================ */
+  section{
+    margin-bottom: var(--section-gap);
+  }
+  section:last-child{ margin-bottom: 0; }
+
+  .section-label{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 14px 0;
+  }
+  .section-label span{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-accent);
+    white-space: nowrap;
+  }
+  .section-label::after{
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--color-line);
+  }
+
+  /* ============================================================
+     ENTRY (education / experience / project blocks)
+     ============================================================ */
+  .entry{
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 16px;
+    align-items: baseline;
+    margin-bottom: 4px;
+  }
+  .entry + .entry{ margin-top: 14px; }
+
+  .entry-title{
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 16.5px;
+    color: var(--color-navy);
+  }
+  .entry-sub{
+    font-size: 13px;
+    color: var(--color-muted);
+    margin-top: 2px;
+  }
+  .entry-date{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-accent);
+    white-space: nowrap;
+    text-align: right;
+  }
+  .entry-tags{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-muted);
+  }
+
+  ul.bullets{
+    margin: 8px 0 0 0;
+    padding-left: 1.1em;
+  }
+  ul.bullets li{
+    margin-bottom: 5px;
+    font-size: 13.5px;
+    color: var(--color-ink);
+  }
+  ul.bullets li::marker{
+    color: var(--color-accent);
+  }
+
+  /* ============================================================
+     SKILLS
+     ============================================================ */
+  .skills-grid{
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 8px 16px;
+    font-size: 13.5px;
+  }
+  .skills-grid dt{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    padding-top: 2px;
+  }
+  .skills-grid dd{
+    margin: 0;
+  }
+  .pill-list{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .pill{
+    display: inline-block;
+    border: 1px solid var(--color-line);
+    color: var(--color-ink);
+    background: var(--color-bg);
+    border-radius: 3px;
+    padding: 3px 9px;
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  /* ============================================================
+     CERTIFICATIONS
+     ============================================================ */
+  .cert-list{
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .cert-row{
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 16px;
+    align-items: baseline;
+    font-size: 13.5px;
+    padding-bottom: 5px;
+    border-bottom: 1px dotted var(--color-line);
+  }
+  .cert-row:last-child{ border-bottom: none; }
+  .cert-date{
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--color-muted);
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  /* ============================================================
+     PRINT / PDF
+     ============================================================ */
+  @media print{
+    @page{
+      size: Letter;
+      margin: 14mm 16mm;
+    }
+    body{ background: var(--color-surface); }
+    .toolbar{ display: none; }
+    .page{
+      margin: 0;
+      max-width: none;
+      padding: 0;
+      box-shadow: none;
+    }
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 640px){
+    .page{ margin: 0; padding: 28px 20px; }
+    .toolbar{ padding: 0 20px; margin-top: 16px; }
+    .header{ flex-direction: column; align-items: flex-start; }
+    .contact-list{ justify-content: flex-start; text-align: left; }
+    .entry{ grid-template-columns: 1fr; }
+    .entry-date{ text-align: left; }
+    .skills-grid{ grid-template-columns: 1fr; }
+    .cert-row{ grid-template-columns: 1fr; }
+    .cert-date{ text-align: left; color: var(--color-accent); }
+  }
+</style>
+</head>
+<body>
+
+  <div class="toolbar">
+    <button onclick="window.print()">Download PDF</button>
+  </div>
+
+  <main class="page">
+    <!-- Everything below is generated from resume-data.js -->
+    <header class="header" id="header"></header>
+
+    <section id="section-education">
+      <div class="section-label"><span>Education</span></div>
+      <div id="education"></div>
+    </section>
+
+    <section id="section-experience">
+      <div class="section-label"><span>Professional Experience</span></div>
+      <div id="experience"></div>
+    </section>
+
+    <section id="section-projects">
+      <div class="section-label"><span>Projects</span></div>
+      <div id="projects"></div>
+    </section>
+
+    <section id="section-skills">
+      <div class="section-label"><span>Technical Skills</span></div>
+      <div id="skills"></div>
+    </section>
+
+    <section id="section-certs">
+      <div class="section-label"><span>Certifications</span></div>
+      <div id="certs"></div>
+    </section>
+  </main>
+
+  <script src="resume-data.js"></script>
+  <script>
+    // ============================================================
+    // RENDERER — turns resumeData into HTML.
+    // You normally do not need to edit this file.
+    // ============================================================
+
+    function el(tag, className, html){
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (html !== undefined) node.innerHTML = html;
+      return node;
+    }
+
+    function renderHeader(data){
+      const header = document.getElementById('header');
+
+      const h1 = el('h1', null, data.name);
+
+      const contactItems = [];
+      if (data.contact.location) contactItems.push(data.contact.location);
+      if (data.contact.email) contactItems.push(`<a href="mailto:${data.contact.email}">${data.contact.email}</a>`);
+      if (data.contact.phone) contactItems.push(data.contact.phone);
+      if (data.contact.linkedin) contactItems.push(`<a href="${data.contact.linkedin}" target="_blank" rel="noopener">${data.contact.linkedinLabel || data.contact.linkedin}</a>`);
+
+      const contact = el('div', 'contact-list',
+        contactItems.map(item => `<span>${item}</span>`).join('<span style="color:var(--color-accent); opacity:0.6;">&nbsp;·&nbsp;</span>')
+      );
+
+      header.appendChild(h1);
+      header.appendChild(contact);
+    }
+
+    function renderEducation(data){
+      const container = document.getElementById('education');
+      if (!data.education || data.education.length === 0){
+        document.getElementById('section-education').style.display = 'none';
+        return;
+      }
+      data.education.forEach(ed => {
+        const entry = el('div', 'entry');
+        entry.appendChild(el('div', null, `
+          <div class="entry-title">${ed.school}</div>
+          <div class="entry-sub">${ed.degree} · ${ed.location}</div>
+        `));
+        entry.appendChild(el('div', 'entry-date', ed.date));
+        container.appendChild(entry);
+      });
+    }
+
+    function renderExperience(data){
+      const container = document.getElementById('experience');
+      if (!data.experience || data.experience.length === 0){
+        document.getElementById('section-experience').style.display = 'none';
+        return;
+      }
+      data.experience.forEach(job => {
+        const entry = el('div', 'entry');
+        entry.appendChild(el('div', null, `
+          <div class="entry-title">${job.title}</div>
+          <div class="entry-sub">${job.company} · ${job.location}</div>
+        `));
+        entry.appendChild(el('div', 'entry-date', job.date));
+        container.appendChild(entry);
+
+        if (job.bullets && job.bullets.length){
+          const ul = el('ul', 'bullets');
+          job.bullets.forEach(b => ul.appendChild(el('li', null, b)));
+          container.appendChild(ul);
+        }
+      });
+    }
+
+    function renderProjects(data){
+      const container = document.getElementById('projects');
+      if (!data.projects || data.projects.length === 0){
+        document.getElementById('section-projects').style.display = 'none';
+        return;
+      }
+      data.projects.forEach(p => {
+        const entry = el('div', 'entry');
+        entry.appendChild(el('div', null, `
+          <div class="entry-title">${p.title}</div>
+          <div class="entry-tags">${p.tags}</div>
+        `));
+        entry.appendChild(el('div', 'entry-date', p.date));
+        container.appendChild(entry);
+
+        if (p.bullets && p.bullets.length){
+          const ul = el('ul', 'bullets');
+          p.bullets.forEach(b => ul.appendChild(el('li', null, b)));
+          container.appendChild(ul);
+        }
+      });
+    }
+
+    function renderSkills(data){
+      const container = document.getElementById('skills');
+      if (!data.skills){
+        document.getElementById('section-skills').style.display = 'none';
+        return;
+      }
+      const dl = el('dl', 'skills-grid');
+
+      const groups = [
+        { key: 'languages', label: 'Languages' },
+        { key: 'tools', label: 'Tools' },
+        { key: 'financial', label: 'Finance' }
+      ];
+
+      groups.forEach(g => {
+        const items = data.skills[g.key];
+        if (!items || items.length === 0) return;
+        dl.appendChild(el('dt', null, g.label));
+        const dd = el('dd', null);
+        const pillList = el('div', 'pill-list');
+        items.forEach(item => pillList.appendChild(el('span', 'pill', item)));
+        dd.appendChild(pillList);
+        dl.appendChild(dd);
+      });
+
+      container.appendChild(dl);
+    }
+
+    function renderCerts(data){
+      const container = document.getElementById('certs');
+      if (!data.certifications || data.certifications.length === 0){
+        document.getElementById('section-certs').style.display = 'none';
+        return;
+      }
+      const list = el('div', 'cert-list');
+      data.certifications.forEach(c => {
+        const row = el('div', 'cert-row');
+        row.appendChild(el('div', null, c.name));
+        row.appendChild(el('div', 'cert-date', c.date));
+        list.appendChild(row);
+      });
+      container.appendChild(list);
+    }
+
+    // ---- run ----
+    renderHeader(resumeData);
+    renderEducation(resumeData);
+    renderExperience(resumeData);
+    renderProjects(resumeData);
+    renderSkills(resumeData);
+    renderCerts(resumeData);
+  </script>
+
+</body>
+</html>
